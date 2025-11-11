@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main-container">
+        <button id="micButton">Izinin Mic duluu~</button>
+        <button id="musicButton" class="hidden">Owkiee lanjutt</button>
+    </div>
+    <div id="cake-container">
+        <div class="cake-scene">
+            <div class="flags-container"></div>
+            <div class="cake-wrapper">
+                <img src="./images/cake_on.png" alt="Birthday Cake" class="cake-img" id="cake-on">
+                <img src="./images/cake_on_cleanup.png" alt="Birthday Cake Blown" class="cake-img" id="cake-off">
+            </div>
+            <div class="balloons-container">
+                <img id="balloon" class="balloon" src="./images/Balloon-Border.png" alt="Flying Balloon">
+            </div>
+            <div id="blow-prompt" class="hidden">
+                <p>Tiup lilinnya lewat mic ya! 🌬️</p>
+            </div>
+            <div id="message">
+                <p>Aku tahu kita nggak bisa ngerayain bareng hari ini,</p>
+                <p>tapi doaku masih sama seperti setiap hari—</p>
+                <p>semoga kamu selalu bahagia, sehat, dan dikelilingi kebaikan.</p>
+                <p>Maaf kalau aku belum bisa ada di samping kamu sekarang,</p>
+                <p>tapi percayalah, hati ini tetap di tempat yang sama: bersamamu.</p>
+                <p class="final">Happy Birthday, BeyBey. 🎂❤️</p>
+        </div>
+    </div>
+    <audio id="hbdSong" src="audio/hbd.mp3"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
