@@ -17,7 +17,7 @@ async function launchConfettiInBursts() {
 // Function to create flags
 function createFlags() {
     const container = document.querySelector('.flags-container');
-    const flagCount = 10; // Number of flags
+    const flagCount = 12; // Number of flags
 
     // Only create flags if they haven't been created yet or if needed
     if (container.children.length === 0) {
@@ -189,3 +189,4 @@ micButton.addEventListener('click', async () => {
         micButton.textContent = 'Mic Error!';
     }
 });
+
