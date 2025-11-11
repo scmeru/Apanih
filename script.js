@@ -1,5 +1,5 @@
 const colors = ['#ff69b4', '#7fccde', '#ffd700', '#90EE90', '#ff9ecd']; 
-const BLOW_THRESHOLD = 70; // Threshold for detecting a blow. Turunkan untuk lebih sensitif, naikkan untuk kurang sensitif.
+const BLOW_THRESHOLD = 85; // Threshold for detecting a blow. Turunkan untuk lebih sensitif, naikkan untuk kurang sensitif.
 let blowDetected = false; // Flag to ensure one-time events happen only once
 
 // Confetti defaults, defined globally
@@ -35,6 +35,11 @@ const musicButton = document.getElementById('musicButton');
 const hbdSong = document.getElementById('hbdSong');
 const blowPrompt = document.getElementById('blow-prompt'); // Get the blow prompt element
 
+// Define audio-related variables in a higher scope
+let analyser;
+let dataArray;
+let bufferLength;
+
 // Handle music button click
 musicButton.addEventListener('click', () => {
     hbdSong.play();
@@ -64,6 +69,10 @@ musicButton.addEventListener('click', () => {
     // Show the blow prompt
     blowPrompt.classList.remove('hidden');
 
+    // Start sound detection only after music button is clicked
+    if (typeof detectBlow === 'function') {
+        detectBlow();
+    }
 
     // Debug image loading
     console.log('Cake container displayed');
@@ -72,8 +81,6 @@ musicButton.addEventListener('click', () => {
     console.log('Cake on image:', cakeOn);
     console.log('Cake off image:', cakeOff);
     
-    // Create flags here, only once when the cake scene is visible
-    createFlags();
 });
 
 
@@ -90,105 +97,95 @@ micButton.addEventListener('click', async () => {
         
         // Create audio context and analyzer
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
+        analyser = audioContext.createAnalyser(); // Assign to the global analyser variable
         const microphone = audioContext.createMediaStreamSource(stream);
         microphone.connect(analyser);
         
         // Configure analyzer
         analyser.fftSize = 256;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        
-        // Function to detect sound level
-        function detectBlow() {
-            analyser.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < bufferLength; i++) {
-                sum += dataArray[i];
-            }
-            let avg = sum / bufferLength;
-            
-            // Hanya update teks tombol mic jika masih terlihat
-            if (!micButton.classList.contains('hidden')) {
-                micButton.textContent = `Mic Level: ${Math.round(avg)}`;
-            }
-            console.log('Current sound level:', avg);
-            
-            // Check if sound is loud enough AND it's the first blow
-            if (avg > BLOW_THRESHOLD && !blowDetected) {
-                console.log('First blow detected!');
-                blowDetected = true; // Set flag to true
-                
-                // Switch cake images
-                document.querySelector('.cake-wrapper').classList.add('blown');
-                
-                // --- Confetti Logic using canvas-confetti ---
-                // --- New Confetti Logic using canvas-confetti ---
-                // Initial burst of confetti
-                for (let i = 0; i < 10; i++) { // Adjust the number of initial bursts as needed
-                    confetti({ ...confettiDefaults, origin: { x: Math.random(), y: Math.random() } });
-                }
-
-                // Function to launch confetti in bursts to prevent lag
-                // Panggil fungsi yang sudah didefinisikan secara global
-                launchConfettiInBursts();
-
-                // Find the balloon and make it fly
-                const balloon = document.getElementById('balloon');
-                if (balloon) {
-                    // Hide the blow prompt once blow is detected
-                    blowPrompt.classList.add('hidden');
-
-                    balloon.classList.add('flying');
-                }
-
-                // Show Happy Birthday message after animation
-                setTimeout(() => {
-                    const msg = document.getElementById('message');
-                    msg.style.opacity = '1'; // Make the whole message visible
-                    
-                    // Ambil semua baris pesan
-                    const lines = msg.querySelectorAll('p');
-                    
-                    // Tampilkan satu per satu dengan jeda lembut
-                    lines.forEach((line, index) => {
-                        setTimeout(() => {
-                            anime({
-                                targets: line,
-                                opacity: 1,
-                                maxWidth: '100%',
-                                easing: 'easeInOutExpo',
-                                duration: 4500, // <-- UBAH INI untuk kecepatan animasi per baris (dalam milidetik)
-                                begin: function(anim) {
-                                    // Set initial styles before animation
-                                    line.style.opacity = '0';
-                                    line.style.maxWidth = '0';
-                                },
-                                complete: function(anim) {
-                                    // Set final styles after animation
-                                    line.style.overflow = 'visible';
-                                }
-                            });
-                        }, index * 3500); // <-- UBAH INI untuk jeda waktu antar baris (dalam milidetik)
-                    });
-                }, 2000);
-
-            }
-
-            // Start sound detection
-        detectBlow(); // Start monitoring for a blow
-        
-            // Continue monitoring
-            requestAnimationFrame(detectBlow);
-        }
-        
-
-
-
+        bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
     } catch (error) {
         console.error('Error accessing microphone:', error);
         micButton.textContent = 'Mic Error!';
     }
 });
 
+// Function to detect sound level, defined globally
+function detectBlow() {
+    // Ensure analyser is ready before proceeding
+    if (!analyser) {
+        requestAnimationFrame(detectBlow); // Wait for analyser to be initialized
+        return;
+    }
 
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i];
+    }
+    let avg = sum / bufferLength;
+    
+    console.log('Current sound level:', avg);
+    
+    // Check if sound is loud enough AND it's the first blow
+    if (avg > BLOW_THRESHOLD && !blowDetected) {
+        console.log('First blow detected!');
+        blowDetected = true; // Set flag to true
+        
+        // Switch cake images
+        document.querySelector('.cake-wrapper').classList.add('blown');
+        
+        // Create flags only when blow is detected
+        createFlags();
+
+        // --- Confetti Logic ---
+        // Initial burst of confetti
+        for (let i = 0; i < 10; i++) {
+            confetti({ ...confettiDefaults, origin: { x: Math.random(), y: Math.random() } });
+        }
+
+        // Start continuous confetti
+        launchConfettiInBursts();
+
+        // Find the balloon and make it fly
+        const balloon = document.getElementById('balloon');
+        if (balloon) {
+            blowPrompt.classList.add('hidden');
+            balloon.classList.add('flying');
+        }
+
+        // Show Happy Birthday message after animation
+        setTimeout(() => {
+            const msg = document.getElementById('message');
+            msg.style.opacity = '1';
+            
+            const lines = msg.querySelectorAll('p');
+            
+            lines.forEach((line, index) => {
+                setTimeout(() => {
+                    anime({
+                        targets: line,
+                        opacity: 1,
+                        maxWidth: '100%',
+                        easing: 'easeInOutExpo',
+                        duration: 4500,
+                        begin: function(anim) {
+                            line.style.opacity = '0';
+                            line.style.maxWidth = '0';
+                        },
+                        complete: function(anim) {
+                            line.style.overflow = 'visible';
+                        }
+                    });
+                }, index * 3500);
+            });
+        }, 2000);
+
+    }
+    
+    // Continue monitoring only if not yet blown
+    if (!blowDetected) {
+        requestAnimationFrame(detectBlow);
+    }
+}
