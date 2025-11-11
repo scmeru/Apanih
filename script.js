@@ -1,5 +1,5 @@
 const colors = ['#ff69b4', '#7fccde', '#ffd700', '#90EE90', '#ff9ecd']; 
-const BLOW_THRESHOLD = 100; // Threshold for detecting a blow. Turunkan untuk lebih sensitif, naikkan untuk kurang sensitif.
+const BLOW_THRESHOLD = 70; // Threshold for detecting a blow. Turunkan untuk lebih sensitif, naikkan untuk kurang sensitif.
 let blowDetected = false; // Flag to ensure one-time events happen only once
 
 // Confetti defaults, defined globally
@@ -64,6 +64,9 @@ musicButton.addEventListener('click', () => {
     // Show the blow prompt
     blowPrompt.classList.remove('hidden');
 
+    // Start sound detection only after music button is clicked
+    detectBlow();
+
     // Debug image loading
     console.log('Cake container displayed');
     const cakeOn = document.getElementById('cake-on');
@@ -74,6 +77,7 @@ musicButton.addEventListener('click', () => {
     // Create flags here, only once when the cake scene is visible
     createFlags();
 });
+
 
 
 // Handle microphone button click
@@ -177,12 +181,11 @@ micButton.addEventListener('click', async () => {
             requestAnimationFrame(detectBlow);
         }
         
-        // Start sound detection
-        detectBlow(); // Start monitoring for a blow
-        
+
+
+
     } catch (error) {
         console.error('Error accessing microphone:', error);
         micButton.textContent = 'Mic Error!';
     }
-
 });
