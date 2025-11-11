@@ -64,8 +64,6 @@ musicButton.addEventListener('click', () => {
     // Show the blow prompt
     blowPrompt.classList.remove('hidden');
 
-    // Start sound detection only after music button is clicked
-    detectBlow();
 
     // Debug image loading
     console.log('Cake container displayed');
@@ -176,7 +174,10 @@ micButton.addEventListener('click', async () => {
                 }, 2000);
 
             }
-            
+
+            // Start sound detection
+        detectBlow(); // Start monitoring for a blow
+        
             // Continue monitoring
             requestAnimationFrame(detectBlow);
         }
@@ -189,4 +190,5 @@ micButton.addEventListener('click', async () => {
         micButton.textContent = 'Mic Error!';
     }
 });
+
 
