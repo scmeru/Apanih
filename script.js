@@ -1,5 +1,5 @@
 const colors = ['#ff69b4', '#7fccde', '#ffd700', '#90EE90', '#ff9ecd']; 
-const BLOW_THRESHOLD = 70; // Threshold for detecting a blow. Turunkan untuk lebih sensitif, naikkan untuk kurang sensitif.
+const BLOW_THRESHOLD = 100; // Threshold for detecting a blow. Turunkan untuk lebih sensitif, naikkan untuk kurang sensitif.
 let blowDetected = false; // Flag to ensure one-time events happen only once
 
 // Confetti defaults, defined globally
@@ -184,4 +184,5 @@ micButton.addEventListener('click', async () => {
         console.error('Error accessing microphone:', error);
         micButton.textContent = 'Mic Error!';
     }
+
 });
